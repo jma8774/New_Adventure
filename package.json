@@ -1,0 +1,21 @@
+{
+  "name": "new-adeventure",
+  "version": "1.0.0",
+  "description": "Start of a new journey!",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "client": "cd ../client && npm run dev",
+    "server": "cd ../server && npm run dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jma8774/New_Adventure.git"
+  },
+  "author": "Jimmy Ma",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jma8774/New_Adventure/issues"
+  },
+  "homepage": "https://github.com/jma8774/New_Adventure#readme"
+}
