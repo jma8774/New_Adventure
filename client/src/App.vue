@@ -1,20 +1,18 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { API_URL, SERVER } from '@/util/constants'
 import { io } from "socket.io-client";
 import { v4 as uuidv4 } from 'uuid';
 import Cookies from 'js-cookie'
 
 let socket;
+const users = ref([])
 const msg = ref('')
 const msgs = ref([])
 
 onMounted(async () =>{ 
   initialize();
-})
-
-onUnmounted(async () => {
-  socket.disconnect();
+  window.addEventListener('beforeunload', () => socket.disconnect())
 })
 
 const initialize = () => {
@@ -33,8 +31,13 @@ const initialize = () => {
   socket.on('disconnect', () => {
     console.log('Disconnected')
   })
-  socket.on('message', (data) => {
-    msgs.value.push(data)
+  socket.on('messages', (data) => {
+    console.log('msgs', data)
+    msgs.value = data
+  })
+  socket.on('users', (data) => {
+    console.log('users', data)
+    users.value = data
   })
 }
 
@@ -60,6 +63,7 @@ const classes = {
 
 <template>
   <div class="ml-2">
+    <div>Connected users: {{ users }}</div>
     <input 
       type="text"
       :value="msg" 
