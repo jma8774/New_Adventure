@@ -1,9 +1,8 @@
 import { Server, Socket } from "socket.io";
 import SocketWrapper from "./wrapper";
-// import registerMessageHandler from "./messageHandler";
 import User from "#classes/user";
 import { users, rooms } from "#core/store";
-import { Room, Chatroom } from "#classes/room";
+import { Chatroom } from "#classes/room";
 
 let io: Server;
 
@@ -24,23 +23,7 @@ const onConnect = () => {
       : console.log(`[${userId}] ${userName} connected`)
     const user = users[userId] = new User(userId, userName, socket)
     
-    // Join a default room with everyone if the user didn't specify a joinRoom query param
-    // if(!wSocket.getQuery().joinRoom) {
-    //   socket.join('default');
-    //   rooms.default.users.push(connectedUsers[userId]);
-    //   rooms.default.msgs.push({
-    //     id: uuidv4(),
-    //     userId: 'System',
-    //     name: 'System',
-    //     msg: `${userName} joined the room`,
-    //     timestamp: Date.now()
-    //   })
-    //   io.to('default').emit('users', Object.values(connectedUsers).map(ui => ui.name));
-    //   io.to('default').emit('messages', rooms.default.msgs);
-    // }
-
     socket.on('join', (roomName: string) => {
-      // registerMessageHandler(io, socket, { room: rooms[users[userId].room] });
       const room = rooms[roomName] = rooms[roomName] || new Chatroom(roomName, [], io);
       room.addUser(user);
     })
