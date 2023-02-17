@@ -2,7 +2,7 @@ import express from "express";
 import { Server } from "socket.io";
 import morgan from 'morgan';
 import http from 'http';
-import socket from '#src/core/socket';
+import socket from '#core/socket';
 
 const start = () => {
   const app     = express()

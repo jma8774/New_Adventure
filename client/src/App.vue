@@ -27,6 +27,7 @@ const initialize = () => {
   socket.connect()
   socket.on('connect', () => {
     console.log('Connected', socket.io.opts.query)
+    socket.emit('join', 'default')
   })
   socket.on('disconnect', () => {
     console.log('Disconnected')
@@ -51,7 +52,10 @@ const getAndCreateTempId = () => {
 }
 
 const sendMsg = (e) => {
-  socket.emit('message', e.target.value)
+  socket.emit('message', {
+    name: socket.io.opts.query.name,
+    msg: e.target.value,
+  })
   msg.value = ''
 }
 
