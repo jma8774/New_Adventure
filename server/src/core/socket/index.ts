@@ -3,8 +3,11 @@ import SocketWrapper from "./wrapper";
 import User from "#classes/user";
 import { users, rooms } from "#core/store";
 import { Chatroom } from "#classes/room";
+import { v4 as uuidv4 } from 'uuid';
+import { logCyan, logGreen, logRed, logBlue } from "#src/util/colorConsole";
 
 let io: Server;
+let sameRoom: string = uuidv4();
 
 const use = (server: Server) => {
   io = server;
@@ -23,19 +26,25 @@ const onConnect = () => {
       : console.log(`[${userId}] ${userName} connected`)
     const user = users[userId] = new User(userId, userName, socket)
     
+    socket.onAny((event, ...args) => {
+      logBlue(`[Debug] Event: ${event} ${args}`)
+    })
+    
     socket.on('join', (roomName: string) => {
-      const room = rooms[roomName] = rooms[roomName] || new Chatroom(roomName, [], io);
+      const roomId = uuidv4()
+      const room = rooms[sameRoom] = rooms[sameRoom] || new Chatroom(sameRoom, roomName, [], io);
       room.addUser(user);
+      // Emit to user that they have joined the room and give them the listener events prefixed by some id
     })
 
     socket.on('leave', () => {
-        
+      // Emit to user that they have left the room
     })
 
     socket.on('disconnect', () => {
       console.log(`[${user.getId()}] ${user.getName()} disconnected`);
+      user.leave();
       delete users[user.getId()];
-      // TODO: Handle leave logic for when user disconnects, make them leave the room
     })
   });
 }

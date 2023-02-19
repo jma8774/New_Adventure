@@ -11,24 +11,21 @@ interface MessagePayload {
 class Chatroom extends Room {
   private msgs: Message[];
 
-  constructor (name: string, users: User[] = [], io: Server) {
+  constructor (id: string, name: string, users: User[] = [], io: Server) {
     const listeners = ['message'];
-    super(name, users, io, listeners);
+    super(id, name, users, io, listeners);
     this.msgs = []
   }
 
-  removeUser(user: User): Room {
-    this.users = this.users.filter(u => u.getId() !== user.getId())
-    user.leave();
-
-    console.log(`[${user.getId()}] ${user.getName()} left [${this.name}]`)
+  afterRemoveUser(user: User): Room {
+    // TODO: perform some room logic here for the chatroom
     return this
   }
 
-  addUser(user: User): Room {
-    this.users.push(user)
-    user.join(this)
-
+  afterAddUser(user: User): Room {
+    // When they join the room, they should load the messages
+    this.emitToRoom('messages', this.msgs)
+    
     user.getSocket().on('message', (payload: MessagePayload) => {
       this.msgs.push({
         id: uuidv4(),
@@ -39,9 +36,6 @@ class Chatroom extends Room {
       });
       this.emitToRoom('messages', this.msgs)
     })
-    
-    console.log(`[${user.getId()}] ${user.getName()} joined [${this.name}]`)
-    console.log("Users:", this.users.map(u => u.getName()))
     return this
   }
 
@@ -56,7 +50,7 @@ class Chatroom extends Room {
   }
 
   private emitToRoom(eventName: string, payload: any) {
-    this.io.to(this.name).emit(eventName, payload);
+    this.io.to(this.id).emit(eventName, payload);
   }
 
 }

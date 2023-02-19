@@ -19,6 +19,7 @@ const initialize = () => {
   let name = prompt("Enter your name") || 'Anonymous';
   socket = io(SERVER, {
     autoConnect: false,
+    reconnection: true,
     query: {
       name,
       id: getAndCreateTempId(),
@@ -52,10 +53,12 @@ const getAndCreateTempId = () => {
 }
 
 const sendMsg = (e) => {
-  socket.emit('message', {
+  const msgPayload = {
     name: socket.io.opts.query.name,
     msg: e.target.value,
-  })
+  }
+  console.log("message", msgPayload)
+  socket.emit('message', msgPayload)
   msg.value = ''
 }
 

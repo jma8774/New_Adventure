@@ -35,14 +35,28 @@ class User {
     return this.socket;
   }
 
+  getRoom() {
+    return this.room;
+  }
+
+  getEvents() {
+    return this.socket.eventNames();
+  }
+
   join(room: Room) {
     this.room = room;
-    this.socket.join(room.getName());
+    this.socket.join(room.getId());
+    // Only call room.addUser if the user is not already in the room (ensures we don't get stuck in infinite loop)
+    if(!room.hasUser(this))
+      room.addUser(this);
   }
 
   leave() {
     if (this.room) {
-      this.socket.leave(this.room.getName());
+      this.socket.leave(this.room.getId());
+      // Only call room.removeUser if the user is in the room (ensures we don't get stuck in infinite loop)
+      if(this.room.hasUser(this))
+        this.room.removeUser(this);
       this.room = undefined;
     }
   }
