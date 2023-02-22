@@ -40,6 +40,7 @@ abstract class Room {
 
     this.io.to(this.id).emit("users", this.users.map(u => u.getName()));
     console.log(`[${user.getId()}] ${user.getName()} left [${this.name}]`)
+    logBlue(`[Debug] Users: [${this.users.map(u => u.getName())}]`)
 
     // Room specific logic
     this.afterRemoveUser(user)

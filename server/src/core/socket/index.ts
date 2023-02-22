@@ -39,6 +39,7 @@ const onConnect = () => {
 
     socket.on('leave', () => {
       // Emit to user that they have left the room
+      user.getRoom()?.removeUser(user);
     })
 
     socket.on('disconnect', () => {
