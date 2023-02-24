@@ -1,19 +1,15 @@
 <script setup>
 import { ref, onMounted } from 'vue';
-import { connect } from '@/core/socket';
 
 onMounted(async () =>{ 
-  initialize();
+  console.log("NotFound mounted")
 })
-
-const initialize = () => {
-  connect();
-}
-
 </script>
 
 <template>
-  <RouterView />
+  <div>
+    Not Found
+  </div>
 </template>
 
 <style scoped>

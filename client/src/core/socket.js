@@ -1,26 +1,25 @@
-import { ref, readonly } from 'vue'
 import { SERVER } from '@/util/constants'
 import { io } from "socket.io-client";
-import getAndCreateTempId from '@/util/getAndCreateTempId';
+import { user, userDispatch } from '@/core/store'
+import { v4 as uuidv4 } from 'uuid'
 
-let name;
 let socket;
-let room = ref(undefined); // TODO: debate whether this should be reactive...
 
 const connect = () => {
-  if(name === undefined) {
+  if(user.name === undefined) {
     // Ask for name (TODO: make a modal for this)
-    name = prompt('What is your name?')
+    userDispatch('setName', prompt('What is your name?') || "Anonymous");
   }
 
   socket = io(SERVER, {
     autoConnect: true,
     reconnection: true,
     query: {
-      name,
-      id: getAndCreateTempId(),
+      name: user.name,
+      id: user.id,
     }
   });
+
   window.addEventListener('beforeunload', () => socket.disconnect())
 
   socket.on('connect', () => {
@@ -34,26 +33,22 @@ const connect = () => {
   return socket;
 }
 
-const join = (roomName) => {
-  // TODO: Implement join room beside's default
-  socket.emit('join', 'default')
-  room.value = 'default'
+const join = (roomData) => {
+  // Hard coded for now
+  roomData = {
+    id: uuidv4(),
+    name: 'default',
+  }
+  socket.emit('join', roomData)
 }
 
 const leave = () => {
-  socket.emit('leave', 'default')
-  room.value = undefined
-
-  // TODO: this should be logic for different rooms, for now it's just default chatroom
-  socket.off('messages')
-  socket.off('users')
+  socket.emit('leave')
 }
 
 export {
-  name,
-  room,
   socket,
   connect,
   join,
-  leave
+  leave,
 }

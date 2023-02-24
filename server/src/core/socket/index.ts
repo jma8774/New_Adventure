@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { logCyan, logGreen, logRed, logBlue } from "#src/util/colorConsole";
 
 let io: Server;
-let sameRoom: string = uuidv4();
+let sameRoomId: string = uuidv4();
 
 const use = (server: Server) => {
   io = server;
@@ -30,16 +30,18 @@ const onConnect = () => {
       logBlue(`[Debug] Event: ${event} ${args}`)
     })
     
-    socket.on('join', (roomName: string) => {
-      const roomId = uuidv4()
-      const room = rooms[sameRoom] = rooms[sameRoom] || new Chatroom(sameRoom, roomName, [], io);
+    socket.on('join', (roomData: { id: string, name: string }) => {
+      const { id, name } = roomData;
+      const room = rooms[sameRoomId] = rooms[sameRoomId] || new Chatroom(sameRoomId, name, [], io);
       room.addUser(user);
       // Emit to user that they have joined the room and give them the listener events prefixed by some id
+      socket.emit("join", roomData)
     })
 
     socket.on('leave', () => {
-      // Emit to user that they have left the room
       user.getRoom()?.removeUser(user);
+      // Emit to user that they have left the room
+      socket.emit("leave")
     })
 
     socket.on('disconnect', () => {

@@ -29,7 +29,7 @@ class Chatroom extends Room {
     user.getSocket().on('message', (payload: MessagePayload) => {
       this.msgs.push({
         id: uuidv4(),
-        userId: uuidv4(),
+        userId: user.getId(),
         name: payload.name,
         msg: payload.msg,
         timestamp: new Date()
