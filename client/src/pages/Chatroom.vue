@@ -1,11 +1,12 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { socket } from '@/core/socket';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import { user, room, roomDispatch } from '@/core/store';
 
 const router = useRouter();
+const route = useRoute();
 const isLoading = ref(true);
 const isKicked = ref(false);
 
@@ -28,6 +29,7 @@ onMounted(async () =>{
     roomDispatch('join', data)
     isLoading.value = false;
     console.log("Joined the room", data)
+    document.title = data.name
   })
 
   socket.on('leave', () => {
@@ -39,15 +41,14 @@ onMounted(async () =>{
 
   // TODO: stop hard code room data
   const roomData = {
-    id: uuidv4(),
-    name: "Hello World"
+    id: route.params.id,
+    name: route.query.nameIfNewRoom || "Hello World"
   }
   socket.emit('join', roomData)
 })
 
 onUnmounted(() => {
-  socket.emit('leave')
-  // User press the back button
+  // User left voluntarily, not kicked
   if(!isKicked.value)
     socket.emit('leave')
     
@@ -95,6 +96,12 @@ const classes = {
   </div>
   <div v-else class="ml-2">
     <div>Connected users: {{ users }}</div>
+    <button 
+      class="block bg-blue-600 px-3 py-1 rounded-lg mt-2 text-slate-100 hover:bg-blue-700" 
+      @click="router.push({ name: 'Home' })"
+    >
+      Leave
+    </button>
     <input 
       type="text"
       :value="msg" 
@@ -106,7 +113,7 @@ const classes = {
       <div
         v-for="msgData in msgs"
         :key="msgData.id"
-        class="grid grid-cols-12"
+        class="grid grid-cols-12 gap-3"
       >
         <div class="col-span-2 mt-1 flex flex-col">
           {{ new Date(msgData.timestamp).toLocaleTimeString() }} 

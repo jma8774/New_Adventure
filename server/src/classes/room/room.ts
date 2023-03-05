@@ -16,7 +16,7 @@ abstract class Room {
     io: Server, 
     listeners: string[] = []
   ) {
-    console.log(`Room [${name}] created`)
+    console.log(`Room [${name}] - ${id} created`)
     this.id = id;
     this.name = name;
     this.users = users;
@@ -39,9 +39,9 @@ abstract class Room {
     }
 
     this.io.to(this.id).emit("users", this.users.map(u => u.getName()));
-    console.log(`[${user.getId()}] ${user.getName()} left [${this.name}]`)
-    logBlue(`[Debug] Users: [${this.users.map(u => u.getName())}]`)
-
+    console.log(`[${user.getId()}] ${user.getName()} left [${this.name} - ${this.id}]`)
+    logBlue(`[Debug] [${this.name} - ${this.id}] Users: [${this.users.map(u => u.getName())}]`)
+    
     // Room specific logic
     this.afterRemoveUser(user)
     return this
@@ -57,8 +57,8 @@ abstract class Room {
     }
     
     this.io.to(this.id).emit("users", this.users.map(u => u.getName()));
-    console.log(`[${user.getId()}] ${user.getName()} joined [${this.name}]`)
-    logBlue(`[Debug] Users: [${this.users.map(u => u.getName())}]`)
+    console.log(`[${user.getId()}] ${user.getName()} joined [${this.name} - ${this.id}]`)
+    logBlue(`[Debug] [${this.name} - ${this.id}] Users: [${this.users.map(u => u.getName())}]`)
 
     // Room specific logic
     this.afterAddUser(user)
@@ -75,6 +75,10 @@ abstract class Room {
 
   getId() {
     return this.id;
+  }
+
+  getType() {
+    return this.constructor.name;
   }
 
   getName() {

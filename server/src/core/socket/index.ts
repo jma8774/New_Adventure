@@ -2,7 +2,7 @@ import { Server, Socket } from "socket.io";
 import SocketWrapper from "./wrapper";
 import User from "#classes/user";
 import { users, rooms } from "#core/store";
-import { Chatroom } from "#classes/room";
+import { Room, Chatroom } from "#classes/room";
 import { v4 as uuidv4 } from 'uuid';
 import { logCyan, logGreen, logRed, logBlue } from "#src/util/colorConsole";
 
@@ -27,26 +27,32 @@ const onConnect = () => {
     const user = users[userId] = new User(userId, userName, socket)
     
     socket.onAny((event, ...args) => {
-      logBlue(`[Debug] Event: ${event} ${args}`)
+      // logBlue(`[Debug] Event: ${event} ${args}`)
     })
     
     socket.on('join', (roomData: { id: string, name: string }) => {
       const { id, name } = roomData;
-      const room = rooms[sameRoomId] = rooms[sameRoomId] || new Chatroom(sameRoomId, name, [], io);
+      // Create a new room with the name if it doesn't exist, otherwise name is not used
+      const room = rooms[id] = rooms[id] || new Chatroom(id, name, [], io);
       room.addUser(user);
-      // Emit to user that they have joined the room and give them the listener events prefixed by some id
-      socket.emit("join", roomData)
+      // TODO: Emit to user that they have joined the room and give them the listener events prefixed by some id
+      socket.emit("join", {
+        id,
+        name: rooms[id].getName(),
+      })
     })
 
     socket.on('leave', () => {
-      user.getRoom()?.removeUser(user);
-      // Emit to user that they have left the room
-      socket.emit("leave")
+      const room = user.getRoom()
+      room?.removeUser(user);
+      deleteRoomIfEmpty(room)
     })
 
     socket.on('disconnect', () => {
       console.log(`[${user.getId()}] ${user.getName()} disconnected`);
-      user.leave();
+      const room = user.getRoom()
+      room?.removeUser(user);
+      deleteRoomIfEmpty(room)
       delete users[user.getId()];
     })
   });
@@ -56,6 +62,15 @@ const onDisconnect = () => {
   io.on('disconnect', (socket: Socket) => {
     console.log('Server has disconnected');
   });
+}
+
+const deleteRoomIfEmpty = (room?: Room) => {
+  if(!room) return;
+
+  if(room && room.getUsers().length === 0) {
+    console.log(`Room [${room.getName()} - ${room.getId()}] closed`)
+    delete rooms[room.getId()]
+  }
 }
 
 export default {

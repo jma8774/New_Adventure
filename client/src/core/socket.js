@@ -8,7 +8,7 @@ let socket;
 const connect = () => {
   if(user.name === undefined) {
     // Ask for name (TODO: make a modal for this)
-    userDispatch('setName', prompt('What is your name?') || "Anonymous");
+    userDispatch('setName', `Anonymous-${uuidv4().slice(0, 4)}`);
   }
 
   socket = io(SERVER, {

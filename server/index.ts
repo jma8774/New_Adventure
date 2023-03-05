@@ -3,6 +3,7 @@ import { Server } from "socket.io";
 import morgan from 'morgan';
 import http from 'http';
 import socket from '#core/socket';
+import roomRouter from '#routes/rooms';
 
 const start = () => {
   const app     = express()
@@ -15,6 +16,11 @@ const start = () => {
 
   app.use(morgan('tiny'))
   
+  const apiRouter = express.Router()
+  apiRouter.use('/rooms', roomRouter)
+
+  app.use('/api', apiRouter)
+
   server.listen(port, () => {
     console.log(`App listening on port ${port}`)
   })
