@@ -20,6 +20,7 @@ const onConnect = () => {
     const wSocket = SocketWrapper(socket);
     const userId = wSocket.getQuery().id as string;
     const userName = wSocket.getQuery().name as string;
+    console.log(socket.id)
 
     users[userId] 
       ? console.log(`[${userId}] ${users[userId].getName()} reconnected as ${userName}`)
@@ -27,7 +28,7 @@ const onConnect = () => {
     const user = users[userId] = new User(userId, userName, socket)
     
     socket.onAny((event, ...args) => {
-      // logBlue(`[Debug] Event: ${event} ${args}`)
+      logBlue(`[Debug] Event: ${event} ${args}`)
     })
     
     socket.on('join', (roomData: { id: string, name: string }) => {

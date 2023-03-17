@@ -1,11 +1,13 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import { getRooms } from '@/api/rooms';
+import { userDispatch } from '@/core/store';
 
 let refresher = null;
 const rooms = ref([]);
+const route = useRoute();
 const router = useRouter();
 
 onMounted(async () =>{ 
@@ -18,7 +20,6 @@ onMounted(async () =>{
 })
 
 onUnmounted(async () => {
-  console.log("Home unmounted")
   clearInterval(refresher)
 })
 
@@ -36,6 +37,12 @@ const handleCreateChatroom = () => {
       @click="handleCreateChatroom"
     >
        Create Chatroom
+    </button>
+    <button 
+      class="block bg-red-600 px-3 py-1 rounded-lg mt-2 text-slate-100 hover:bg-red-700" 
+      @click="userDispatch('logout')"
+    >
+      Logout
     </button>
     <div class="flex flex-wrap gap-3 mt-3">
       <RouterLink

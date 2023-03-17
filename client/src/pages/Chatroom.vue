@@ -39,7 +39,6 @@ onMounted(async () =>{
     destroyRoomListeners();
   })
 
-  // TODO: stop hard code room data
   const roomData = {
     id: route.params.id,
     name: route.query.nameIfNewRoom || "Hello World"

@@ -2,21 +2,31 @@ import { SERVER } from '@/util/constants'
 import { io } from "socket.io-client";
 import { user, userDispatch } from '@/core/store'
 import { v4 as uuidv4 } from 'uuid'
+import route from '@/router'
 
 let socket;
 
-const connect = () => {
+const NO_ID         = 'No id'  
+const NO_TOKEN      = 'No token'
+const INVALID_ID    = 'Invalid id'
+const INVALID_TOKEN = 'Invalid token'
+
+const connect = async () => {
+  if(socket) return new Promise(resolve => resolve(socket));
+
   if(user.name === undefined) {
-    // Ask for name (TODO: make a modal for this)
     userDispatch('setName', `Anonymous-${uuidv4().slice(0, 4)}`);
   }
 
   socket = io(SERVER, {
-    autoConnect: true,
     reconnection: true,
     query: {
       name: user.name,
       id: user.id,
+    },
+    auth: {
+      token: user.token,
+      id: user.id
     }
   });
 
@@ -27,10 +37,29 @@ const connect = () => {
   })
 
   socket.on('disconnect', () => {
+    socket = undefined;
     console.log('Disconnected')
   })
 
-  return socket;
+  socket.on("connect_error", (err) => {
+    if (err.message === NO_ID) {
+      console.log('No id')
+    } else if (err.message === NO_TOKEN) {
+      console.log('No token')
+    } else if (err.message === INVALID_ID) {
+      console.log('Invalid id')
+    } else if (err.message === INVALID_TOKEN) {
+      console.log('Invalid token')
+    }
+    userDispatch('logout')
+  });
+
+  socket.connect();
+  return new Promise(resolve => resolve(socket));
+}
+
+const disconnect = () => {
+  socket?.disconnect();
 }
 
 const join = (roomData) => {
@@ -49,6 +78,7 @@ const leave = () => {
 export {
   socket,
   connect,
+  disconnect,
   join,
   leave,
 }
