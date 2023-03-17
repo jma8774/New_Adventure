@@ -12,6 +12,7 @@ const router = useRouter();
 onMounted(async () =>{ 
   // TODO: make ui look better for login
   console.log("Login Mounted")
+  document.title = "Login"
 
   if(!user.id) {
     let id;

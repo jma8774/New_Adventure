@@ -12,6 +12,7 @@ const router = useRouter();
 
 onMounted(async () =>{ 
   console.log("Home mounted")
+  document.title = "Home"
   
   rooms.value = (await getRooms()) || [];
   refresher = setInterval(async () => {

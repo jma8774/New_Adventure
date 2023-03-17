@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import { user, userDispatch } from '@/core/store'
 import { v4 as uuidv4 } from 'uuid'
 import route from '@/router'
+import router from '@/router/index';
 
 let socket;
 
@@ -30,8 +31,6 @@ const connect = async () => {
     }
   });
 
-  window.addEventListener('beforeunload', () => socket.disconnect())
-
   socket.on('connect', () => {
     console.log('Connected', socket.io.opts.query)
   })
@@ -39,6 +38,7 @@ const connect = async () => {
   socket.on('disconnect', () => {
     socket = undefined;
     console.log('Disconnected')
+    router.push({ name: 'Disconnected' })
   })
 
   socket.on("connect_error", (err) => {

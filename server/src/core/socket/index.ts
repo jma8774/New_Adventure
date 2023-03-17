@@ -20,15 +20,15 @@ const onConnect = () => {
     const wSocket = SocketWrapper(socket);
     const userId = wSocket.getQuery().id as string;
     const userName = wSocket.getQuery().name as string;
-    console.log(socket.id)
 
-    users[userId] 
-      ? console.log(`[${userId}] ${users[userId].getName()} reconnected as ${userName}`)
-      : console.log(`[${userId}] ${userName} connected`)
+    console.log(`[${socket.id}] ${userName} (${userId}) connected`)
+    if(users[userId]?.getSocket()?.id !== socket.id)
+      users[userId]?.getSocket().disconnect()
+
     const user = users[userId] = new User(userId, userName, socket)
     
     socket.onAny((event, ...args) => {
-      logBlue(`[Debug] Event: ${event} ${args}`)
+      // logBlue(`[Debug] Event: ${event} ${args}`)
     })
     
     socket.on('join', (roomData: { id: string, name: string }) => {
@@ -50,7 +50,7 @@ const onConnect = () => {
     })
 
     socket.on('disconnect', () => {
-      console.log(`[${user.getId()}] ${user.getName()} disconnected`);
+      console.log(`[${socket.id}] ${user.getName()} (${user.getId()}) disconnected`);
       const room = user.getRoom()
       room?.removeUser(user);
       deleteRoomIfEmpty(room)

@@ -3,6 +3,7 @@ import { ref, onMounted } from 'vue';
 
 onMounted(async () =>{ 
   console.log("NotFound mounted")
+  document.title = "Not Found"
 })
 </script>
 

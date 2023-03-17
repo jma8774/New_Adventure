@@ -34,11 +34,11 @@ const userDispatch = (action, payload) => {
       cookies.setId(undefined);
       cookies.setToken(undefined);
       socket.disconnect();
-      console.log(router.currentRoute.value.fullPath)
       router.push({ 
         name: 'Login', 
         params: { id: uuidv4() },
-        query: { redirect: router.currentRoute.value.fullPath }
+        // TODO: make smarter redirects maybe?
+        // query: { redirect: router.currentRoute.value.fullPath }
       })
     },
     login: (userData) => {

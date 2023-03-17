@@ -3,6 +3,7 @@ import Home from '@/pages/Home.vue'
 import Chatroom from '@/pages/Chatroom.vue'
 import NotFound from '@/pages/NotFound.vue'
 import Login from '@/pages/Login.vue'
+import Disconnected from '@/pages/Disconnected.vue'
 
 const routes = [
   {
@@ -14,6 +15,11 @@ const routes = [
     path: '/login/:id',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/disconnected',
+    name: 'Disconnected',
+    component: Disconnected
   },
   {
     path: '/chatroom/:id',
